@@ -54,7 +54,7 @@ src/
 - Domain-based ticket organization
 - Priority and status indicators
 - Reusable UI components
-- Loading, empty, and error UI states
+- empty, and error UI states
 - Clean internal dashboard layout
 
 ---
@@ -151,7 +151,7 @@ All business logic, component logic, and TypeScript implementation were written 
 ## Repository
 
 ```txt
-Add your GitHub repository link here
+https://github.com/crotch-watch/Ticket-Management
 ```
 
 ---
