@@ -159,5 +159,5 @@ https://github.com/crotch-watch/Ticket-Management
 ## Live Application
 
 ```txt
-https://ticket-management-jmmzhdluc-crotch-watchs-projects.vercel.app/
+https://ticket-management-mu-three.vercel.app/
 ```
