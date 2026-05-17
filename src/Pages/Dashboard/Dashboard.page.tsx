@@ -7,12 +7,24 @@ import { CallToAction } from "../../Components/CallToAction/CTA.component"
 
 import { useTicketContext } from "../../Hooks/useTicketContext/useTicketContext.hook"
 
+import { Filters } from "../../Components/Filters/Filters.component"
+import { useEffect } from "react"
+import { NoFilterResults } from "../../Components/NoFilteredResults/NoFilteredResults.component"
+
 export default function TickeTDashboard() {
   const navigateTo = useNavigate()
 
   const {
-    state: { tickets }
+    state: {
+      ticketsState: { tickets, filteredTickets }
+    },
+    setters: { exitEditingMode }
   } = useTicketContext()
+
+  useEffect(() => {
+    return () => exitEditingMode()
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const stats = { open: 0, progress: 0, total: 0, critical: 0 }
 
@@ -27,8 +39,11 @@ export default function TickeTDashboard() {
   const content = noTickets ? (
     <CallToAction onAction={() => navigateTo("/ticket-form")} />
   ) : (
-    <TicketTable tickets={tickets} />
+    <TicketTable tickets={filteredTickets} />
   )
+
+  const noFilteredValueExists =
+    tickets.length > 0 && filteredTickets.length === 0
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -59,7 +74,9 @@ export default function TickeTDashboard() {
           <Summary label="Critical" value={stats.critical.toString()} />
         </div>
 
-        {content}
+        <Filters />
+
+        {noFilteredValueExists ? <NoFilterResults /> : content}
       </div>
     </div>
   )

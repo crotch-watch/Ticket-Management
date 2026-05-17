@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 
 import { context } from "./TicketContext"
 
@@ -10,7 +10,10 @@ import {
 
 import type { TicketInputs } from "../../Pages/CreateTicket/CreateTicket.types"
 import type { Ticket } from "../../Types/Ticket.types"
-import type { TicketUpdatePayload } from "../../Types/TickerReducer.types"
+import type {
+  TicketFilterChangePayload,
+  TicketUpdatePayload
+} from "../../Types/TickerReducer.types"
 
 export const TicketContextProvider = ({
   children
@@ -18,11 +21,16 @@ export const TicketContextProvider = ({
   children: React.ReactNode
 }) => {
   const {
-    tickets,
-    setters: { createTicket, editTicket, deleteTicket }
+    ticketsState,
+    setters: { createTicket, editTicket, deleteTicket, editFilters }
   } = useTicket()
 
-  const { inputs, updateFormOnChange, clearInputs, addInputs } = useTicketForm()
+  const updateFilters = (event: OnChangeEvent) => {
+    const { name, value } = event.target
+    editFilters({ [name]: value } as TicketFilterChangePayload)
+  }
+
+  const { inputs, updateFormOnChange, addInputs, clearInputs } = useTicketForm()
 
   const handleFormCreation = (event: React.SubmitEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -47,11 +55,18 @@ export const TicketContextProvider = ({
 
   const [mode, setMode] = useState<"viewing" | "editing">("viewing")
 
+  const exitEditingMode = () => {
+    setMode("viewing")
+    setEditingId("")
+  }
+
   const enterEditingMode = (id: Ticket["id"]) => {
     setMode("editing")
     setEditingId(id)
 
-    const selectedTicket = tickets.find((ticket) => ticket.id === id)
+    const selectedTicket = ticketsState.tickets.find(
+      (ticket) => ticket.id === id
+    )
 
     if (selectedTicket) {
       addInputs({
@@ -76,7 +91,7 @@ export const TicketContextProvider = ({
     <context.Provider
       value={{
         state: {
-          tickets,
+          ticketsState: ticketsState,
           formInputs: inputs,
           mode,
           editingId
@@ -88,7 +103,10 @@ export const TicketContextProvider = ({
           handleInputChange,
           enterEditingMode,
           saveTicketChanges,
-          addEditingId
+          addEditingId,
+          updateFilters,
+          exitEditingMode,
+          clearInputs
         }
       }}
     >

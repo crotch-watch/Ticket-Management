@@ -1,11 +1,31 @@
 import { useReducer } from "react"
 import { ticketReducer } from "./ticketReducer"
 
-import type { Ticket } from "../../Types/Ticket.types"
-import type { TicketUpdatePayload } from "../../Types/TickerReducer.types"
+import type {
+  Ticket,
+  TicketFilters,
+  TicketState
+} from "../../Types/Ticket.types"
+import type {
+  TicketFilterChangePayload,
+  TicketUpdatePayload
+} from "../../Types/TickerReducer.types"
 
-export const useTicket = (initial: Array<Ticket> = []) => {
-  const [tickets, dispatch] = useReducer(ticketReducer, initial)
+export const EMPTY_FILTERS: TicketFilters = {
+  search: "",
+  domain: "All Domains",
+  priority: "All Priorities",
+  status: "All Statuses"
+} as const
+
+export const INITIAL_TICKET_STATE: TicketState = {
+  filters: EMPTY_FILTERS,
+  tickets: [],
+  filteredTickets: []
+} as const
+
+export const useTicket = (initial: TicketState = INITIAL_TICKET_STATE) => {
+  const [ticketsState, dispatch] = useReducer(ticketReducer, initial)
 
   const createTicket = (ticket: Ticket) => {
     dispatch({ type: "CREATE", payload: ticket })
@@ -19,5 +39,12 @@ export const useTicket = (initial: Array<Ticket> = []) => {
     dispatch({ type: "DELETE", payload: id })
   }
 
-  return { tickets, setters: { createTicket, editTicket, deleteTicket } }
+  const editFilters = (filters: TicketFilterChangePayload) => {
+    dispatch({ type: "EDIT_FILTERS", payload: filters })
+  }
+
+  return {
+    ticketsState,
+    setters: { createTicket, editTicket, deleteTicket, editFilters }
+  }
 }

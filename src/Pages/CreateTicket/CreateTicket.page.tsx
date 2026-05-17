@@ -1,3 +1,4 @@
+import { useEffect } from "react"
 import { useNavigate } from "react-router"
 
 import { Button } from "../../Components/Button/Button"
@@ -11,8 +12,14 @@ import { useTicketContext } from "../../Hooks/useTicketContext/useTicketContext.
 export const TicketForm = () => {
   const {
     state: { formInputs },
-    setters: { handleInputChange, handleFormCreation }
+    setters: { handleInputChange, handleFormCreation, clearInputs }
   } = useTicketContext()
+
+
+  useEffect(() => {
+    return () => clearInputs()
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const navigateTo = useNavigate()
 
@@ -125,7 +132,7 @@ export const TicketForm = () => {
         </FieldGroup>
 
         <div className="flex justify-end gap-3 pt-2">
-          <Button variant="warn" onClick={() => navigateTo("/")}>
+          <Button variant="warn" onClick={() => navigateTo("/")} type="reset">
             Cancel
           </Button>
 

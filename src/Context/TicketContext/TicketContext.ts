@@ -7,11 +7,12 @@ import {
 
 import type { TicketInputs } from "../../Pages/CreateTicket/CreateTicket.types"
 import type { TicketUpdatePayload } from "../../Types/TickerReducer.types"
-import type { Ticket } from "../../Types/Ticket.types"
+import type { Ticket, TicketState } from "../../Types/Ticket.types"
+import { INITIAL_TICKET_STATE } from "../../Hooks/useTicket/useTicket.hook"
 
 export type Context = {
   state: {
-    tickets: Array<Ticket>
+    ticketsState: TicketState
     formInputs: TicketInputs
     mode: "viewing" | "editing"
     editingId: Ticket["id"]
@@ -24,12 +25,15 @@ export type Context = {
     enterEditingMode: (id: Ticket["id"]) => void
     saveTicketChanges: (payload: TicketUpdatePayload) => void
     addEditingId: (id: Ticket["id"]) => void
+    updateFilters: (event: OnChangeEvent) => void
+    exitEditingMode: () => void
+    clearInputs: () => void
   }
 }
 
 export const context = React.createContext<Context>({
   state: {
-    tickets: [],
+    ticketsState: INITIAL_TICKET_STATE,
     formInputs: INITIAL_INPUTS,
     mode: "viewing",
     editingId: ""
@@ -41,6 +45,9 @@ export const context = React.createContext<Context>({
     handleInputChange: () => {},
     enterEditingMode: () => {},
     saveTicketChanges: () => {},
-    addEditingId: () => {}
+    addEditingId: () => {},
+    updateFilters: () => {},
+    exitEditingMode: () => {},
+    clearInputs: () => {}
   }
 })

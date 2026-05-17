@@ -11,3 +11,17 @@ export type Ticket = {
   status: Statuses
   createdAt: Date
 }
+
+export type TicketFilters = {
+  search: string
+  domain: Domains | "All Domains"
+  priority: Priorities | "All Priorities"
+  status: Statuses | "All Statuses"
+}
+
+export type TicketState = {
+  filters: TicketFilters
+  filteredTickets: Array<Ticket>
+  tickets: Array<Ticket>
+}
+
