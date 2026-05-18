@@ -12,8 +12,8 @@ type Ticket = {
   createdAt: Date
 }
 
-type Tickets = Array<Ticket>
-type FilteredTickets = Array<Ticket>
+type Tickets = { type: "master"; list: Array<Ticket> }
+type FilteredTickets = { type: "filtered"; list: Array<Ticket> }
 
 type TicketFilters = {
   searchTerm: string
@@ -23,14 +23,17 @@ type TicketFilters = {
 }
 
 type Mode = "editing" | "viewing"
-type TicketsBeingEdited = Array<Ticket["id"]>
 
-type Ticketstate = {
+type TicketsBeingEdited = { type: "editing"; list: Array<Ticket["id"]> }
+type SelectedTickets = { type: "selected"; list: Array<Ticket["id"]> }
+
+export type TicketsState = {
   mode: Mode
   data: Tickets
   view: {
     filters: TicketFilters
     filteredTickets: FilteredTickets
     ticketsBeingEdited: TicketsBeingEdited
+    selectedTickets: SelectedTickets
   }
 }
