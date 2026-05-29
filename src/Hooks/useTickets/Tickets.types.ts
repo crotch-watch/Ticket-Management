@@ -14,12 +14,13 @@ export type Ticket = {
     createdAt: Date
 }
 
-type Tickets = { type: "master"; list: Array<Ticket> }
-type NoTickets = { type: "master"; list: readonly [] }
+type EmptyList = readonly []
 
-export type FilteredTicketsPresent = { type: "filtered"; list: Array<Ticket> }
-export type FilteredTicketsAbsent = { type: "filtered"; list: readonly [] }
-export type FilteredTickets = FilteredTicketsAbsent | FilteredTicketsPresent
+export type TicketsPresent = Array<Ticket> & { _brand: "main" }
+export type Tickets = EmptyList | TicketsPresent
+
+export type FilteredTicketsPresent = Array<Ticket> & { _brand: "filtered" }
+export type FilteredTickets = EmptyList | FilteredTicketsPresent
 
 export type TicketFilters = {
     searchTerm: string
@@ -37,42 +38,40 @@ type InitialTicketFilters = {
 
 export type Modes = (typeof modes)[keyof typeof modes]
 
-type TicketsBeingEdited = { type: "editing"; list: Array<Ticket["id"]> }
-type NoTicketsBeingEdited = { type: "editing"; list: readonly [] }
+type TicketsBeingEdited = Array<Ticket["id"]> & { _brand: "editing" }
 
-type SelectedTickets = { type: "selected"; list: Array<Ticket["id"]> }
-type NoSelectedTickets = { type: "selected"; list: readonly [] }
+type SelectedTickets = Array<Ticket["id"]> & { _brand: "selected" }
 
 type NoTicketsPresent = {
     mode: "absent"
-    data: NoTickets
+    data: EmptyList
     view: {
         filters: InitialTicketFilters
-        filteredTickets: FilteredTicketsAbsent
-        ticketsBeingEdited: NoTicketsBeingEdited
-        selectedTickets: NoSelectedTickets
+        filteredTickets: EmptyList
+        ticketsBeingEdited: EmptyList
+        selectedTickets: EmptyList
     }
 }
 
 type ViewingTickets = {
     mode: "viewing"
-    data: Tickets
+    data: TicketsPresent
     view: {
         filters: TicketFilters
         filteredTickets: FilteredTickets
-        ticketsBeingEdited: NoTicketsBeingEdited
-        selectedTickets: NoSelectedTickets | SelectedTickets
+        ticketsBeingEdited: EmptyList
+        selectedTickets: EmptyList | SelectedTickets
     }
 }
 
 type EditingTickets = {
     mode: "editing"
-    data: Tickets
+    data: TicketsPresent
     view: {
         filters: TicketFilters
         filteredTickets: FilteredTickets
         ticketsBeingEdited: TicketsBeingEdited
-        selectedTickets: NoSelectedTickets | SelectedTickets
+        selectedTickets: EmptyList | SelectedTickets
     }
 }
 
