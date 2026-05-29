@@ -10,17 +10,24 @@ type EditFilterPayload =
     | { priority: TicketFilters["priority"] }
     | { domain: TicketFilters["domain"] }
 
+export const ticketActions = {
+    SUBMITTED_TICKET_FORM: "[Ticket Form] User Submitted Ticket Details",
+    CLICKED_SAVE_DETAILS: "[Dashboard Table Row] Save Button Clicked"
+} as const
+
 export type AddTicketAction = {
-    type: "ADD_TICKET"
+    type: typeof ticketActions.SUBMITTED_TICKET_FORM
     payload: Ticket
+}
+
+export type EditTicketAction = {
+    type: typeof ticketActions.CLICKED_SAVE_DETAILS
+    payload: EditTicketPayload
 }
 
 export type TicketsActions =
     | AddTicketAction
-    | {
-          type: "EDIT_TICKET"
-          payload: EditTicketPayload
-      }
+    | EditTicketAction
     | {
           type: "DELETE_TICKET"
           payload: Ticket["id"]
