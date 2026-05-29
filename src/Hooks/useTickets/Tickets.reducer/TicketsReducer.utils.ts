@@ -1,6 +1,6 @@
 import type { Ticket, TicketFilters } from "../Tickets.types"
 
-export function callback(filters: TicketFilters, ticket: Ticket) {
+export function applyFilters(ticket: Ticket, filters: TicketFilters) {
     const { searchTerm, domain, priority, status } = filters
 
     const normalizedSearch = searchTerm.trim().toLowerCase()
