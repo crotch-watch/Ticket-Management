@@ -53,7 +53,7 @@ type NoTicketsPresent = {
     }
 }
 
-type ViewingTickets = {
+export type ViewingTickets = {
     mode: "viewing"
     data: TicketsPresent
     view: {

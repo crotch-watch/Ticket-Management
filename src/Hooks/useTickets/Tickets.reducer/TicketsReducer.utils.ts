@@ -4,7 +4,9 @@ import type {
   Ticket,
   TicketFilters,
   Tickets,
-  TicketsPresent
+  TicketsPresent,
+  TicketsState,
+  ViewingTickets
 } from "../Tickets.types"
 
 export function applyFilters(ticket: Ticket, filters: TicketFilters) {
@@ -27,7 +29,17 @@ export function applyFilters(ticket: Ticket, filters: TicketFilters) {
 
 export const ticketsArePresent = (tickets: Tickets): tickets is TicketsPresent => tickets.length > 0
 
-export const brand = <Source, Target>(source: Source) => source as unknown as Target
+export const ticketsAs = <Target extends TicketsPresent | FilteredTicketsPresent>(tickets: Array<Ticket>) =>
+  tickets as Target
 
-export const filteredTicketsArePresent = (filteredTickets: FilteredTickets): filteredTickets is FilteredTicketsPresent =>
-  filteredTickets.length > 0
+export const filteredTicketsArePresent = (
+  filteredTickets: FilteredTickets
+): filteredTickets is FilteredTicketsPresent => filteredTickets.length > 0
+
+export const prepareViewState = (state: TicketsState): Omit<ViewingTickets, "data"> => {
+  return {
+    ...state,
+    mode: "viewing",
+    view: { ...state.view, ticketsBeingEdited: [] }
+  }
+}
