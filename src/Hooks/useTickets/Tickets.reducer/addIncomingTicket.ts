@@ -1,19 +1,14 @@
-import {
-    applyFilters,
-    ticketsAs,
-    filteredTicketsArePresent,
-    ticketsArePresent,
-    prepareViewState
-} from "./TicketsReducer.utils"
+import { applyFilters } from "./TicketsReducer.utils"
 
-import type { FilteredTicketsPresent, Ticket, TicketsPresent, TicketsState } from "../Tickets.types"
+import { elementsIn, filter, map, merge } from "../../../Types/List.types"
+
+import type { Ticket, TicketsState } from "../Tickets.types"
 import type { AddTicketAction } from "./Reducer.types"
 
 export const addIncomingTickets = (state: TicketsState, payload: AddTicketAction["payload"]): TicketsState => {
-    const incomingTicket = payload
-
     const lookup = new Set<Ticket["id"]>()
-    const deduped = incomingTicket.filter(ticket => {
+
+    const deduped = filter(payload, ticket => {
         if (lookup.has(ticket.id)) return false
         else {
             lookup.add(ticket.id)
@@ -21,43 +16,60 @@ export const addIncomingTickets = (state: TicketsState, payload: AddTicketAction
         }
     })
 
-    const { data: tickets, view } = state
-    const { filters, filteredTickets } = view
+    if (!elementsIn(deduped)) return state
 
-    const baseViewState = prepareViewState(state)
+    const { data: existingTickets, view } = state
 
-    if (!ticketsArePresent(tickets))
+    if (!elementsIn(existingTickets))
         return {
-            ...baseViewState,
-            data: ticketsAs<TicketsPresent>(deduped),
+            mode: "viewing",
+            data: deduped,
+            view: { ...view, filteredTickets: deduped, ticketsBeingEdited: [] }
+        }
+
+    const existingIds = new Set(map(existingTickets, ticket => ticket.id))
+
+    const newTickets = filter(deduped, dedup => !existingIds.has(dedup.id))
+
+    const { filteredTickets: existingFilteredTickets } = view
+
+    if (!elementsIn(newTickets))
+        return {
+            ...state,
+            mode: "viewing",
+            data: existingTickets,
             view: {
-                ...baseViewState.view,
-                filteredTickets: ticketsAs<FilteredTicketsPresent>(deduped)
+                ...view,
+                ticketsBeingEdited: []
             }
         }
 
-    const existingIds = new Set(tickets.map(ticket => ticket.id))
+    const { filters } = view
 
-    const newTickets = deduped.filter(dedup => !existingIds.has(dedup.id))
+    const ticketsPassedFilters = filter(newTickets, newticket => applyFilters(newticket, filters))
 
-    if (!newTickets.length) return { ...baseViewState, data: tickets }
+    const updatedTickets = merge(newTickets, existingTickets)
 
-    const passedFilters = newTickets.filter(newticket => applyFilters(newticket, filters))
+    if (!elementsIn(ticketsPassedFilters))
+        return {
+            ...state,
+            mode: "viewing",
+            data: updatedTickets,
+            view: { ...view, ticketsBeingEdited: [] }
+        }
 
-    const updatedTickets = ticketsAs<TicketsPresent>([...newTickets, ...tickets])
-
-    if (!passedFilters.length) return { ...baseViewState, data: updatedTickets }
-
-    const updatedFilteredTickets = ticketsAs<FilteredTicketsPresent>(
-        filteredTicketsArePresent(filteredTickets) ? [...passedFilters, ...filteredTickets] : passedFilters
-    )
+    const updatedFilteredTickets = elementsIn(existingFilteredTickets)
+        ? merge(ticketsPassedFilters, existingFilteredTickets)
+        : ticketsPassedFilters
 
     return {
-        ...baseViewState,
+        ...state,
+        mode: "viewing",
         data: updatedTickets,
         view: {
-            ...baseViewState.view,
-            filteredTickets: updatedFilteredTickets
+            ...view,
+            filteredTickets: updatedFilteredTickets,
+            ticketsBeingEdited: []
         }
     }
 }

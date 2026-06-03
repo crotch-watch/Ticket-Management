@@ -1,3 +1,4 @@
+import type { EmptyList, List, NonEmptyList } from "../../Types/List.types"
 import type { modes } from "./Tickets.consts"
 
 export type Domains = "Engineering" | "DevOps" | "HR" | "IT" | "Finance"
@@ -13,14 +14,6 @@ export type Ticket = {
     status: Statuses
     createdAt: Date
 }
-
-type EmptyList = readonly []
-
-export type TicketsPresent = Array<Ticket> & { _brand: "main" }
-export type Tickets = EmptyList | TicketsPresent
-
-export type FilteredTicketsPresent = Array<Ticket> & { _brand: "filtered" }
-export type FilteredTickets = EmptyList | FilteredTicketsPresent
 
 export type TicketFilters = {
     searchTerm: string
@@ -38,9 +31,7 @@ type InitialTicketFilters = {
 
 export type Modes = (typeof modes)[keyof typeof modes]
 
-type TicketsBeingEdited = Array<Ticket["id"]> & { _brand: "editing" }
-
-type SelectedTickets = Array<Ticket["id"]> & { _brand: "selected" }
+type SelectedTickets = List<Ticket["id"]>
 
 type NoTicketsPresent = {
     mode: "absent"
@@ -55,23 +46,23 @@ type NoTicketsPresent = {
 
 export type ViewingTickets = {
     mode: "viewing"
-    data: TicketsPresent
+    data: NonEmptyList<Ticket>
     view: {
         filters: TicketFilters
-        filteredTickets: FilteredTickets
+        filteredTickets: List<Ticket>
         ticketsBeingEdited: EmptyList
-        selectedTickets: EmptyList | SelectedTickets
+        selectedTickets: SelectedTickets
     }
 }
 
 type EditingTickets = {
     mode: "editing"
-    data: TicketsPresent
+    data: NonEmptyList<Ticket>
     view: {
         filters: TicketFilters
-        filteredTickets: FilteredTickets
-        ticketsBeingEdited: TicketsBeingEdited
-        selectedTickets: EmptyList | SelectedTickets
+        filteredTickets: NonEmptyList<Ticket>
+        ticketsBeingEdited: NonEmptyList<Ticket["id"]>
+        selectedTickets: SelectedTickets
     }
 }
 

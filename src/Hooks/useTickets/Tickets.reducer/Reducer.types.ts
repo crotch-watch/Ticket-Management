@@ -1,3 +1,4 @@
+import type { NonEmptyList } from "../../../Types/List.types";
 import type { Priorities, Statuses, Ticket, TicketFilters } from "../Tickets.types"
 
 type EditTicketPayload = {
@@ -17,7 +18,7 @@ export const ticketActions = {
 
 export type AddTicketAction = {
     type: typeof ticketActions.SUBMITTED_TICKET_FORM
-    payload: Array<Ticket>
+    payload: NonEmptyList<Ticket>
 }
 
 export type EditTicketAction = {
