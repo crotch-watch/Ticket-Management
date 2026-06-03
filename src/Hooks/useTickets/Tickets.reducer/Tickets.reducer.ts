@@ -1,4 +1,4 @@
-import { addIncomingTicket } from "./addIncomingTicket"
+import { addIncomingTickets } from "./addIncomingTicket"
 
 const { SUBMITTED_TICKET_FORM } = ticketActions
 
@@ -10,7 +10,7 @@ export const ticketsReducer = (state: TicketsState, action: TicketsActions): Tic
 
     switch (type) {
         case SUBMITTED_TICKET_FORM:
-            return addIncomingTicket(state, action.payload)
+            return addIncomingTickets(state, action.payload)
 
         default:
             return state

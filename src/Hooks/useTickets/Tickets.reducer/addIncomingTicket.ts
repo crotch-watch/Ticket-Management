@@ -6,30 +6,50 @@ import {
     prepareViewState
 } from "./TicketsReducer.utils"
 
-import type { FilteredTicketsPresent, TicketsPresent, TicketsState } from "../Tickets.types"
+import type { FilteredTicketsPresent, Ticket, TicketsPresent, TicketsState } from "../Tickets.types"
 import type { AddTicketAction } from "./Reducer.types"
 
-export const addIncomingTicket = (state: TicketsState, payload: AddTicketAction["payload"]): TicketsState => {
+export const addIncomingTickets = (state: TicketsState, payload: AddTicketAction["payload"]): TicketsState => {
     const incomingTicket = payload
+
+    const lookup = new Set<Ticket["id"]>()
+    const deduped = incomingTicket.filter(ticket => {
+        if (lookup.has(ticket.id)) return false
+        else {
+            lookup.add(ticket.id)
+            return true
+        }
+    })
 
     const { data: tickets, view } = state
     const { filters, filteredTickets } = view
 
     const baseViewState = prepareViewState(state)
 
-    if (!ticketsArePresent(tickets)) return { ...baseViewState, data: ticketsAs<TicketsPresent>([incomingTicket]) }
+    if (!ticketsArePresent(tickets))
+        return {
+            ...baseViewState,
+            data: ticketsAs<TicketsPresent>(deduped),
+            view: {
+                ...baseViewState.view,
+                filteredTickets: ticketsAs<FilteredTicketsPresent>(deduped)
+            }
+        }
 
-    const idExists = tickets.some(ticket => ticket.id === incomingTicket.id)
-    if (idExists) return state
+    const existingIds = new Set(tickets.map(ticket => ticket.id))
 
-    const passedFilters = applyFilters(incomingTicket, filters)
+    const newTickets = deduped.filter(dedup => !existingIds.has(dedup.id))
 
-    const updatedTickets = ticketsAs<TicketsPresent>([incomingTicket, ...tickets])
+    if (!newTickets.length) return { ...baseViewState, data: tickets }
 
-    if (!passedFilters) return { ...baseViewState, data: updatedTickets }
+    const passedFilters = newTickets.filter(newticket => applyFilters(newticket, filters))
+
+    const updatedTickets = ticketsAs<TicketsPresent>([...newTickets, ...tickets])
+
+    if (!passedFilters.length) return { ...baseViewState, data: updatedTickets }
 
     const updatedFilteredTickets = ticketsAs<FilteredTicketsPresent>(
-        filteredTicketsArePresent(filteredTickets) ? [incomingTicket, ...filteredTickets] : [incomingTicket]
+        filteredTicketsArePresent(filteredTickets) ? [...passedFilters, ...filteredTickets] : passedFilters
     )
 
     return {

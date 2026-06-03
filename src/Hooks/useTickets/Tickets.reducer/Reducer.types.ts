@@ -17,7 +17,7 @@ export const ticketActions = {
 
 export type AddTicketAction = {
     type: typeof ticketActions.SUBMITTED_TICKET_FORM
-    payload: Ticket
+    payload: Array<Ticket>
 }
 
 export type EditTicketAction = {
