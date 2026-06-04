@@ -1,4 +1,5 @@
 import type { Ticket, TicketFilters } from "../Tickets.types"
+import type { ApplyViewInvariantsTo } from "./Reducer.types"
 
 export function applyFilters(ticket: Ticket, filters: TicketFilters) {
     const { searchTerm, domain, priority, status } = filters
@@ -16,4 +17,19 @@ export function applyFilters(ticket: Ticket, filters: TicketFilters) {
     const hasSpecifiedStatus = status === "All Statuses" || ticket.status === status
 
     return hasSearchTerm && hasSpecifiedDomain && hasSpecifiedPriority && hasSpecifiedStatus
+}
+
+export const applyViewInvariantsTo: ApplyViewInvariantsTo = state => {
+    return ({ tickets, filteredTickets }) => {
+        return {
+            ...state,
+            mode: "viewing",
+            data: tickets,
+            view: {
+                ...state.view,
+                filteredTickets,
+                ticketsBeingEdited: []
+            }
+        }
+    }
 }

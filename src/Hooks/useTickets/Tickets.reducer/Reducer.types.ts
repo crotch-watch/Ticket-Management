@@ -1,5 +1,6 @@
-import type { NonEmptyList } from "../../../Types/List.types";
-import type { Priorities, Statuses, Ticket, TicketFilters } from "../Tickets.types"
+import type { NonEmptyList } from "../../../Types/List.types"
+import type { Priorities, Statuses, Ticket, TicketFilters, TicketsState, ViewingTickets } from "../Tickets.types"
+import type { ticketsReducer } from "./Tickets.reducer"
 
 type EditTicketPayload = {
     id: Ticket["id"]
@@ -37,3 +38,15 @@ export type TicketsActions =
           type: "EDIT_FILTER"
           payload: EditFilterPayload
       }
+
+export type AddIncomingTickets = (
+    state: TicketsState,
+    payload: AddTicketAction["payload"]
+) => ReturnType<typeof ticketsReducer>
+
+export type ApplyViewInvariantsTo = (
+    state: TicketsState
+) => (args: {
+    tickets: ViewingTickets["data"]
+    filteredTickets: ViewingTickets["view"]["filteredTickets"]
+}) => ViewingTickets
