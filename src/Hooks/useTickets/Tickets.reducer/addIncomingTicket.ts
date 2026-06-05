@@ -1,50 +1,34 @@
-import { applyViewInvariantsTo, applyFilters } from "./TicketsReducer.utils"
+import { applyViewInvariantsTo, applyFilters, deduplicateTickets } from "./TicketsReducer.utils"
 
 import { elementsIn, filter, map, merge } from "../../../Types/List.types"
 
-import type { Ticket } from "../Tickets.types"
 import type { AddIncomingTickets } from "./Reducer.types"
 
 export const addIncomingTickets: AddIncomingTickets = (state, payload) => {
-    const lookup = new Set<Ticket["id"]>()
-
-    const deduped = filter(payload, ticket => {
-        if (lookup.has(ticket.id)) return false
-        else {
-            lookup.add(ticket.id)
-            return true
-        }
-    })
-
-    if (!elementsIn(deduped)) return state
+    const deduped = deduplicateTickets(payload)
 
     const { data: existingTickets, view } = state
+    const { filteredTickets: existingFilteredTickets, filters } = view
 
     const createViewStateWith = applyViewInvariantsTo(state)
 
     if (!elementsIn(existingTickets)) return createViewStateWith({ tickets: deduped, filteredTickets: deduped })
 
     const existingIds = new Set(map(existingTickets, ticket => ticket.id))
+    const uniqueTickets = filter(deduped, ticket => !existingIds.has(ticket.id))
 
-    const newTickets = filter(deduped, dedup => !existingIds.has(dedup.id))
+    if (!elementsIn(uniqueTickets)) return state
 
-    const { filteredTickets: existingFilteredTickets } = view
+    const uniquesPassedFilters = filter(uniqueTickets, ticket => applyFilters(ticket, filters))
+    const prependedTickets = merge(uniqueTickets, existingTickets)
 
-    if (!elementsIn(newTickets))
-        return createViewStateWith({ tickets: existingTickets, filteredTickets: existingFilteredTickets })
-
-    const { filters } = view
-
-    const ticketsPassedFilters = filter(newTickets, newTicket => applyFilters(newTicket, filters))
-
-    const updatedTickets = merge(newTickets, existingTickets)
-
-    if (!elementsIn(ticketsPassedFilters))
-        return createViewStateWith({ tickets: updatedTickets, filteredTickets: existingFilteredTickets })
+    if (!elementsIn(uniquesPassedFilters)) {
+        return createViewStateWith({ tickets: prependedTickets, filteredTickets: existingFilteredTickets })
+    }
 
     const updatedFilteredTickets = elementsIn(existingFilteredTickets)
-        ? merge(ticketsPassedFilters, existingFilteredTickets)
-        : ticketsPassedFilters
+        ? merge(uniquesPassedFilters, existingFilteredTickets)
+        : uniquesPassedFilters
 
-    return createViewStateWith({ tickets: updatedTickets, filteredTickets: updatedFilteredTickets })
+    return createViewStateWith({ tickets: prependedTickets, filteredTickets: updatedFilteredTickets })
 }
