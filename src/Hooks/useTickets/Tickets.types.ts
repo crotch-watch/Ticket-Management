@@ -33,7 +33,7 @@ export type Modes = (typeof modes)[keyof typeof modes]
 
 type SelectedTickets = List<Ticket["id"]>
 
-type NoTicketsPresent = {
+export type NoTicketsPresent = {
     mode: "absent"
     data: EmptyList
     view: {
@@ -55,7 +55,7 @@ export type ViewingTickets = {
     }
 }
 
-type EditingTickets = {
+export type EditingTickets = {
     mode: "editing"
     data: NonEmptyList<Ticket>
     view: {

@@ -14,7 +14,8 @@ type EditFilterPayload =
 
 export const ticketActions = {
     SUBMITTED_TICKET_FORM: "[Ticket Form] User Submitted Ticket Details",
-    CLICKED_SAVE_DETAILS: "[Dashboard Table Row] Save Button Clicked"
+    CLICKED_SAVE_DETAILS: "[Dashboard Table Row] Save Button Clicked",
+    CLICKED_DELETE_TICKET: "[Dashboard Table Row] Delete Button Clicked"
 } as const
 
 export type AddTicketAction = {
@@ -27,13 +28,15 @@ export type EditTicketAction = {
     payload: EditTicketPayload
 }
 
+export type DeleteTicketsAction = {
+    type: typeof ticketActions.CLICKED_DELETE_TICKET
+    payload: NonEmptyList<Ticket["id"]>
+}
+
 export type TicketsActions =
     | AddTicketAction
     | EditTicketAction
-    | {
-          type: "DELETE_TICKET"
-          payload: Ticket["id"]
-      }
+    | DeleteTicketsAction
     | {
           type: "EDIT_FILTER"
           payload: EditFilterPayload
