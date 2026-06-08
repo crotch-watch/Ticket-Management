@@ -10,7 +10,9 @@ export function elementsIn<T>(array: List<T>): array is NonEmptyList<T> {
 
 type ListPredicate<T> = (item: NonNullable<T>, index: number) => boolean
 
-export function filter<T>(array: NonEmptyList<T>, predicate: ListPredicate<T>) {
+export function filter<T>(array: List<T>, predicate: ListPredicate<T>) {
+    if (!elementsIn(array)) return array
+
     const result = []
     let index = 0
 
