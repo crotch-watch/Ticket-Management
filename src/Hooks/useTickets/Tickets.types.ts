@@ -22,7 +22,7 @@ export type TicketFilters = {
     status: Ticket["status"] | "All Statuses"
 }
 
-type InitialTicketFilters = {
+export type InitialTicketFilters = {
     searchTerm: ""
     domain: "All Domains"
     priority: "All Priorities"

@@ -52,4 +52,5 @@ export type ApplyViewInvariantsTo = (
 ) => (args: {
     tickets: ViewingTickets["data"]
     filteredTickets: ViewingTickets["view"]["filteredTickets"]
+    selectedTickets?: ViewingTickets["view"]["selectedTickets"]
 }) => ViewingTickets

@@ -1,54 +1,74 @@
 import { elementsIn, filter } from "../../../Types/List.types"
-import type { EditingTickets, Ticket, TicketsState, ViewingTickets } from "../Tickets.types"
+
+import { applyViewInvariantsTo } from "./TicketsReducer.utils"
+
+import { TICKETS_ABSENT, modes } from "../Tickets.consts"
+
+import type { EditingTickets, NoTicketsPresent, TicketsState } from "../Tickets.types"
 import type { DeleteTicketsAction } from "./Reducer.types"
 
-export const INITIAL_TICKETS_STATE = {
-    mode: "absent",
-    data: [],
-    view: {
-        filteredTickets: [],
-        ticketsBeingEdited: [],
-        filters: { searchTerm: "", domain: "All Domains", status: "All Statuses", priority: "All Priorities" },
-        selectedTickets: []
-    }
-} as const
+const { viewing, editing } = modes
 
-type FilledState = ViewingTickets | EditingTickets
-export const deleteTickets = (state: FilledState, payload: DeleteTicketsAction["payload"]): TicketsState => {
+export const deleteTickets = (
+    state: Exclude<TicketsState, NoTicketsPresent>,
+    payload: DeleteTicketsAction["payload"]
+) => {
     const { data: tickets, view } = state
-    const { ticketsBeingEdited } = view
+    const { filteredTickets, selectedTickets } = view
 
     const uniqueIDs = new Set(payload)
-    const removedIds = new Set<Ticket["id"]>()
 
-    const newTickets = filter(tickets, ({ id }) => {
-        if (!uniqueIDs.has(id)) return true
-        else {
-            removedIds.add(id)
-            return false
+    const updatedTickets = filter(tickets, ticket => !uniqueIDs.has(ticket.id))
+
+    const updatedFilteredTickets = elementsIn(filteredTickets)
+        ? filter(filteredTickets, ticket => !uniqueIDs.has(ticket.id))
+        : ([] as const)
+
+    const updatedSelections = elementsIn(selectedTickets)
+        ? filter(selectedTickets, selection => !uniqueIDs.has(selection))
+        : ([] as const)
+
+    if (!elementsIn(updatedTickets)) return TICKETS_ABSENT
+
+    switch (state.mode) {
+        case viewing: {
+            return applyViewInvariantsTo(state)({
+                tickets: updatedTickets,
+                filteredTickets: updatedFilteredTickets,
+                selectedTickets: updatedSelections
+            })
         }
-    })
 
-    if (!elementsIn(newTickets)) return INITIAL_TICKETS_STATE
+        case editing: {
+            const updatedLiveEdits = filter(state.view.ticketsBeingEdited, ticketID => !uniqueIDs.has(ticketID))
 
-    const newFilteredTickets = filter(tickets, ticket => !removedIds.has(ticket.id))
+            if (!elementsIn(updatedFilteredTickets) || !elementsIn(updatedLiveEdits)) {
+                const createState = applyViewInvariantsTo(state)
 
-    if (!elementsIn(ticketsBeingEdited)) {
-        return {
-            mode: "viewing",
-            data: newTickets,
-            view: { ...state.view, filteredTickets: newFilteredTickets, ticketsBeingEdited: [] }
+                return createState({
+                    tickets: updatedTickets,
+                    filteredTickets: updatedFilteredTickets,
+                    selectedTickets: updatedSelections
+                })
+            }
+
+            const editingState: EditingTickets = {
+                mode: editing,
+                data: updatedTickets,
+                view: {
+                    ...state.view,
+                    filteredTickets: updatedFilteredTickets,
+                    ticketsBeingEdited: updatedLiveEdits,
+                    selectedTickets: updatedSelections
+                }
+            }
+
+            return editingState
         }
-    }
 
-    return {
-        mode: "editing",
-        data: newTickets,
-        view: {
-            ...state.view,
-            ticketsBeingEdited,
-            filteredTickets: newFilteredTickets,
-            filters: { ...state.view.filters }
+        default: {
+            const _exhaustiveCheck: never = state
+            return _exhaustiveCheck
         }
     }
 }

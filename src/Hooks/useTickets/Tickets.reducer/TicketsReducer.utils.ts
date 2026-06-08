@@ -21,7 +21,7 @@ export function applyFilters(ticket: Ticket, filters: TicketFilters) {
 }
 
 export const applyViewInvariantsTo: ApplyViewInvariantsTo = state => {
-    return ({ tickets, filteredTickets }) => {
+    return ({ tickets, filteredTickets, selectedTickets = state.view.selectedTickets }) => {
         return {
             ...state,
             mode: "viewing",
@@ -29,6 +29,7 @@ export const applyViewInvariantsTo: ApplyViewInvariantsTo = state => {
             view: {
                 ...state.view,
                 filteredTickets,
+                selectedTickets,
                 ticketsBeingEdited: []
             }
         }
