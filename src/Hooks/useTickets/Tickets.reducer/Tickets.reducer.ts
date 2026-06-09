@@ -1,6 +1,6 @@
 import { addIncomingTickets } from "./addIncomingTicket"
 import { deleteTickets } from "./deleteTickets"
-import { updateTickets } from "./editTickets"
+import { updateTickets } from "./updateTickets"
 
 import { modes } from "../Tickets.consts"
 
