@@ -1,5 +1,13 @@
 import type { NonEmptyList } from "../../../Types/List.types"
-import type { Priorities, Statuses, Ticket, TicketFilters, TicketsState, ViewingTickets } from "../Tickets.types"
+import type {
+    EditingTickets,
+    Priorities,
+    Statuses,
+    Ticket,
+    TicketFilters,
+    TicketsState,
+    ViewingTickets
+} from "../Tickets.types"
 import type { ticketsReducer } from "./Tickets.reducer"
 
 type EditTicketPayload = {
@@ -54,3 +62,12 @@ export type ApplyViewInvariantsTo = (
     filteredTickets: ViewingTickets["view"]["filteredTickets"]
     selectedTickets?: ViewingTickets["view"]["selectedTickets"]
 }) => ViewingTickets
+
+export type ApplyEditingInvariantsTo = (
+    state: TicketsState
+) => (args: {
+    ticketsBeingEdited: EditingTickets["view"]["ticketsBeingEdited"]
+    tickets: EditingTickets["data"]
+    filteredTickets?: EditingTickets["view"]["filteredTickets"]
+    selectedTickets?: EditingTickets["view"]["selectedTickets"]
+}) => EditingTickets

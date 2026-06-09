@@ -1,6 +1,6 @@
 import { elementsIn, filter } from "../../../Types/List.types"
 
-import { applyViewInvariantsTo } from "./TicketsReducer.utils"
+import { applyEditingInvariantsTo, applyViewInvariantsTo } from "./TicketsReducer.utils"
 
 import { TICKETS_ABSENT, modes } from "../Tickets.consts"
 
@@ -14,43 +14,42 @@ export const deleteTickets = (
     payload: DeleteTicketsAction["payload"]
 ): TicketsState => {
     const { data: tickets, view } = state
-    const { filteredTickets, selectedTickets } = view
+    const { filteredTickets, selectedTickets, ticketsBeingEdited } = view
 
     const uniqueIDs = new Set(payload)
 
     const updatedTickets = filter(tickets, ticket => !uniqueIDs.has(ticket.id))
-    const updatedFilteredTickets = filter(filteredTickets, ticket => !uniqueIDs.has(ticket.id))
-    const updatedSelections = filter(selectedTickets, selection => !uniqueIDs.has(selection))
 
     if (!elementsIn(updatedTickets)) return TICKETS_ABSENT
 
+    const updatedFilteredTickets = filter(filteredTickets, ticket => !uniqueIDs.has(ticket.id))
+    const updatedSelections = filter(selectedTickets, selection => !uniqueIDs.has(selection))
+
     const createViewState = applyViewInvariantsTo(state)
 
-    const updates = {
+    const baseUpdates = {
         tickets: updatedTickets,
         filteredTickets: updatedFilteredTickets,
         selectedTickets: updatedSelections
     }
 
+    const updatedViewingState = createViewState(baseUpdates)
+
     switch (state.mode) {
         case viewing:
-            return createViewState(updates)
+            return updatedViewingState
 
         case editing: {
-            const updatedLiveEdits = filter(state.view.ticketsBeingEdited, ticketID => !uniqueIDs.has(ticketID))
+            const updatedLiveEdits = filter(ticketsBeingEdited, ticketID => !uniqueIDs.has(ticketID))
 
-            if (elementsIn(updatedFilteredTickets) && elementsIn(updatedLiveEdits))
-                return {
-                    mode: editing,
-                    data: updatedTickets,
-                    view: {
-                        ...state.view,
-                        filteredTickets: updatedFilteredTickets,
-                        ticketsBeingEdited: updatedLiveEdits,
-                        selectedTickets: updatedSelections
-                    }
-                }
-            else return createViewState(updates)
+            if (!elementsIn(updatedLiveEdits)) return updatedViewingState
+
+            const createEditingState = applyEditingInvariantsTo(state)
+
+            return createEditingState({
+                ...baseUpdates,
+                ticketsBeingEdited: updatedLiveEdits
+            })
         }
 
         default: {

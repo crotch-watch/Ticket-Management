@@ -60,7 +60,7 @@ export type EditingTickets = {
     data: NonEmptyList<Ticket>
     view: {
         filters: TicketFilters
-        filteredTickets: NonEmptyList<Ticket>
+        filteredTickets: List<Ticket>
         ticketsBeingEdited: NonEmptyList<Ticket["id"]>
         selectedTickets: SelectedTickets
     }

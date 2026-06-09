@@ -1,6 +1,9 @@
 import { filter, type NonEmptyList } from "../../../Types/List.types"
+
+import { modes } from "../Tickets.consts"
+
 import type { Ticket, TicketFilters } from "../Tickets.types"
-import type { ApplyViewInvariantsTo } from "./Reducer.types"
+import type { ApplyEditingInvariantsTo, ApplyViewInvariantsTo } from "./Reducer.types"
 
 export function applyFilters(ticket: Ticket, filters: TicketFilters) {
     const { searchTerm, domain, priority, status } = filters
@@ -20,11 +23,13 @@ export function applyFilters(ticket: Ticket, filters: TicketFilters) {
     return hasSearchTerm && hasSpecifiedDomain && hasSpecifiedPriority && hasSpecifiedStatus
 }
 
+const { viewing, editing } = modes
+
 export const applyViewInvariantsTo: ApplyViewInvariantsTo = state => {
     return ({ tickets, filteredTickets, selectedTickets = state.view.selectedTickets }) => {
         return {
             ...state,
-            mode: "viewing",
+            mode: viewing,
             data: tickets,
             view: {
                 ...state.view,
@@ -49,3 +54,24 @@ export const deduplicateTickets = (tickets: NonEmptyList<Ticket>) => {
 
     return deduped as unknown as NonEmptyList<Ticket>
 }
+
+export const applyEditingInvariantsTo: ApplyEditingInvariantsTo =
+    state =>
+    ({
+        ticketsBeingEdited,
+        tickets,
+        filteredTickets = state.view.filteredTickets,
+        selectedTickets = state.view.selectedTickets
+    }) => {
+        return {
+            ...state,
+            mode: editing,
+            data: tickets,
+            view: {
+                ...state.view,
+                ticketsBeingEdited,
+                filteredTickets,
+                selectedTickets
+            }
+        }
+    }
