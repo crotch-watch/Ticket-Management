@@ -10,10 +10,12 @@ import type {
 } from "../Tickets.types"
 import type { ticketsReducer } from "./Tickets.reducer"
 
-type EditTicketPayload = {
+type RequestedChange = {
     id: Ticket["id"]
-    changes: { status: Statuses } | { priorities: Priorities } | { status: Statuses; priority: Priorities }
+    changes: { status: Statuses } | { priority: Priorities } | { status: Statuses; priority: Priorities }
 }
+
+type RequestedChanges = NonEmptyList<RequestedChange>
 
 type EditFilterPayload =
     | { status: TicketFilters["status"] }
@@ -33,7 +35,7 @@ export type AddTicketAction = {
 
 export type EditTicketAction = {
     type: typeof ticketActions.CLICKED_SAVE_DETAILS
-    payload: EditTicketPayload
+    payload: RequestedChanges
 }
 
 export type DeleteTicketsAction = {
