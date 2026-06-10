@@ -4,15 +4,12 @@ import { applyEditingInvariantsTo, applyViewInvariantsTo } from "./TicketsReduce
 
 import { TICKETS_ABSENT, modes } from "../Tickets.consts"
 
-import type { NoTicketsPresent, TicketsState } from "../Tickets.types"
+import type { FilledState, TicketsState } from "../Tickets.types"
 import type { DeleteTicketsAction } from "./Reducer.types"
 
 const { viewing, editing } = modes
 
-export const deleteTickets = (
-    state: Exclude<TicketsState, NoTicketsPresent>,
-    payload: DeleteTicketsAction["payload"]
-): TicketsState => {
+export const deleteTickets = (state: FilledState, payload: DeleteTicketsAction["payload"]): TicketsState => {
     const { data: tickets, view } = state
     const { filteredTickets, selectedTickets, ticketsBeingEdited } = view
 

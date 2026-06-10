@@ -3,12 +3,10 @@ import { applyEditingInvariantsTo, applyFilters, applyViewInvariantsTo } from ".
 
 import { modes } from "../Tickets.consts"
 
-import type { NoTicketsPresent, TicketsState } from "../Tickets.types"
 import type { UpdateFiltersAction } from "./Reducer.types"
+import type { FilledState } from "../Tickets.types"
 
 const { viewing, editing } = modes
-
-type FilledState = Exclude<TicketsState, NoTicketsPresent>
 
 export const updateFilters = (state: FilledState, payload: UpdateFiltersAction["payload"]): FilledState => {
     const { mode, data: tickets, view } = state

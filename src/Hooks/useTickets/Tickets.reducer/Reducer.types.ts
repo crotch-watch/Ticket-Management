@@ -1,6 +1,7 @@
 import type { NonEmptyList } from "../../../Types/List.types"
 import type {
     EditingTickets,
+    FilledState,
     Priorities,
     Statuses,
     Ticket,
@@ -65,7 +66,9 @@ export type ApplyViewInvariantsTo = (
     filters?: ViewingTickets["view"]["filters"]
 }) => ViewingTickets
 
-export type ApplyEditingInvariantsTo = (state: TicketsState) => (args: {
+export type ApplyEditingInvariantsTo = (
+    state: FilledState
+) => (args: {
     ticketsBeingEdited: EditingTickets["view"]["ticketsBeingEdited"]
     tickets: EditingTickets["data"]
     filteredTickets?: EditingTickets["view"]["filteredTickets"]

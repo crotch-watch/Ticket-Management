@@ -66,4 +66,6 @@ export type EditingTickets = {
     }
 }
 
+export type FilledState = Exclude<TicketsState, NoTicketsPresent>
+
 export type TicketsState = NoTicketsPresent | ViewingTickets | EditingTickets
