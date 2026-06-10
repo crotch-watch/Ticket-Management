@@ -1,13 +1,14 @@
 import { addIncomingTickets } from "./addIncomingTicket"
 import { deleteTickets } from "./deleteTickets"
 import { updateTickets } from "./updateTickets"
+import { updateFilters } from "./updateFilters"
 
 import { modes } from "../Tickets.consts"
 
 import { ticketActions, type TicketsActions } from "./Reducer.types"
 import type { TicketsState } from "../Tickets.types"
 
-const { SUBMITTED_TICKET_FORM, CLICKED_DELETE_TICKET, CLICKED_SAVE_DETAILS } = ticketActions
+const { SUBMITTED_TICKET_FORM, CLICKED_DELETE_TICKET, CLICKED_SAVE_DETAILS, CHANGED_FILTER } = ticketActions
 const { editing } = modes
 
 export const ticketsReducer = (state: TicketsState, action: TicketsActions): TicketsState => {
@@ -25,6 +26,11 @@ export const ticketsReducer = (state: TicketsState, action: TicketsActions): Tic
         case CLICKED_SAVE_DETAILS: {
             if (state.mode === editing) return updateTickets(state, action.payload)
             else return state
+        }
+
+        case CHANGED_FILTER: {
+            if (state.mode === "absent") return state
+            else return updateFilters(state, action.payload)
         }
 
         default:

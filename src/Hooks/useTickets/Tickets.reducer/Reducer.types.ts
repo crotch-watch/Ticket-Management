@@ -25,7 +25,8 @@ type EditFilterPayload =
 export const ticketActions = {
     SUBMITTED_TICKET_FORM: "[Ticket Form] User Submitted Ticket Details",
     CLICKED_SAVE_DETAILS: "[Dashboard Table Row] Save Button Clicked",
-    CLICKED_DELETE_TICKET: "[Dashboard Table Row] Delete Button Clicked"
+    CLICKED_DELETE_TICKET: "[Dashboard Table Row] Delete Button Clicked",
+    CHANGED_FILTER: "[Dashboard Table Head] Changed Filter"
 } as const
 
 export type AddTicketAction = {
@@ -43,14 +44,12 @@ export type DeleteTicketsAction = {
     payload: NonEmptyList<Ticket["id"]>
 }
 
-export type TicketsActions =
-    | AddTicketAction
-    | EditTicketAction
-    | DeleteTicketsAction
-    | {
-          type: "EDIT_FILTER"
-          payload: EditFilterPayload
-      }
+export type UpdateFiltersAction = {
+    type: typeof ticketActions.CHANGED_FILTER
+    payload: EditFilterPayload
+}
+
+export type TicketsActions = AddTicketAction | EditTicketAction | DeleteTicketsAction | UpdateFiltersAction
 
 export type AddIncomingTickets = (
     state: TicketsState,
@@ -63,13 +62,13 @@ export type ApplyViewInvariantsTo = (
     tickets: ViewingTickets["data"]
     filteredTickets: ViewingTickets["view"]["filteredTickets"]
     selectedTickets?: ViewingTickets["view"]["selectedTickets"]
+    filters?: ViewingTickets["view"]["filters"]
 }) => ViewingTickets
 
-export type ApplyEditingInvariantsTo = (
-    state: TicketsState
-) => (args: {
+export type ApplyEditingInvariantsTo = (state: TicketsState) => (args: {
     ticketsBeingEdited: EditingTickets["view"]["ticketsBeingEdited"]
     tickets: EditingTickets["data"]
     filteredTickets?: EditingTickets["view"]["filteredTickets"]
     selectedTickets?: EditingTickets["view"]["selectedTickets"]
+    filters?: EditingTickets["view"]["filters"]
 }) => EditingTickets
